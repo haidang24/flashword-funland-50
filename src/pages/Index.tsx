@@ -2,13 +2,14 @@
 import { useState } from "react";
 import { Navbar } from "@/components/Navbar";
 import { FlashcardDeck } from "@/components/FlashcardDeck";
-import { flashcardData } from "@/data/flashcards";
+import { getFlashcards } from "@/data/flashcards";
 import { Button } from "@/components/ui/button";
-import { BookOpen, PlusCircle } from "lucide-react";
+import { BookOpen, ListFilter, PlusCircle } from "lucide-react";
 import { Link } from "react-router-dom";
 
 const Index = () => {
   const [started, setStarted] = useState(false);
+  const flashcards = getFlashcards();
 
   return (
     <div className="flex flex-col min-h-screen bg-background transition-colors duration-300">
@@ -38,12 +39,23 @@ const Index = () => {
                     onClick={() => setStarted(true)}
                     className="animate-float"
                   >
-                    Start Learning
+                    Quick Start
                   </Button>
-                  <Link to="/manage" className="animate-float">
+                  <Link to="/topics">
                     <Button 
                       size="lg"
                       variant="outline"
+                      className="animate-float gap-2"
+                    >
+                      <ListFilter className="h-4 w-4 mr-2" />
+                      Browse Topics
+                    </Button>
+                  </Link>
+                  <Link to="/manage">
+                    <Button 
+                      size="lg"
+                      variant="outline"
+                      className="animate-float"
                     >
                       <PlusCircle className="h-4 w-4 mr-2" />
                       Manage Flashcards
@@ -77,7 +89,7 @@ const Index = () => {
               </p>
             </div>
             
-            <FlashcardDeck cards={flashcardData} />
+            <FlashcardDeck cards={flashcards} />
             
             <div className="flex justify-center gap-4 mt-8">
               <Button 
@@ -86,6 +98,12 @@ const Index = () => {
               >
                 Back to Home
               </Button>
+              <Link to="/topics">
+                <Button variant="outline">
+                  <ListFilter className="h-4 w-4 mr-2" />
+                  Browse Topics
+                </Button>
+              </Link>
               <Link to="/manage">
                 <Button variant="secondary">
                   <PlusCircle className="h-4 w-4 mr-2" />

@@ -5,7 +5,7 @@ import { Card } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
 import { Check, X } from "lucide-react";
-import { categories } from "@/data/flashcards";
+import { getCategories } from "@/data/flashcards";
 
 export interface FlashcardData {
   id: number;
@@ -27,6 +27,7 @@ interface FlashcardProps {
 export function Flashcard({ card, onNext, onKnown, onUnknown, isActive }: FlashcardProps) {
   const [isFlipped, setIsFlipped] = useState(false);
   const [isExiting, setIsExiting] = useState(false);
+  const categories = getCategories();
 
   const getCategoryColor = (categoryId?: string) => {
     if (!categoryId) return "";
