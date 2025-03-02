@@ -1,11 +1,10 @@
-
 import { useState, useEffect } from "react";
 import { Flashcard, FlashcardData } from "./Flashcard";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 import { ArrowLeft, ArrowRight, Bookmark, BookmarkCheck, RefreshCw, Tag } from "lucide-react";
 import { toast } from "sonner";
-import { categories } from "@/data/flashcards";
+import { getCategories } from "@/data/flashcards";
 import { 
   DropdownMenu,
   DropdownMenuContent,
@@ -27,14 +26,12 @@ export function FlashcardDeck({ cards }: FlashcardDeckProps) {
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
   const [deckComplete, setDeckComplete] = useState(false);
   const [progress, setProgress] = useState(0);
+  const categories = getCategories();
 
-  // Filter cards based on mode and category
   const filteredCards = cards.filter(card => {
-    // Apply category filter
     if (selectedCategory && card.categoryId !== selectedCategory) {
       return false;
     }
-    // Apply review mode filter
     if (showReviewMode && !reviewCards.includes(card.id)) {
       return false;
     }
@@ -44,7 +41,6 @@ export function FlashcardDeck({ cards }: FlashcardDeckProps) {
   const activeCards = filteredCards;
 
   useEffect(() => {
-    // Reset current index when filters change
     setCurrentIndex(0);
     setDeckComplete(false);
   }, [selectedCategory, showReviewMode]);
@@ -84,7 +80,6 @@ export function FlashcardDeck({ cards }: FlashcardDeckProps) {
     if (!knownCards.includes(id)) {
       setKnownCards([...knownCards, id]);
     }
-    // Remove from review if it was there
     setReviewCards(reviewCards.filter(cardId => cardId !== id));
   };
 
@@ -116,7 +111,6 @@ export function FlashcardDeck({ cards }: FlashcardDeckProps) {
     toast.info("Deck reset");
   };
 
-  // Get category counts
   const getCategoryCounts = () => {
     const counts: Record<string, number> = {};
     categories.forEach(category => {
@@ -139,7 +133,6 @@ export function FlashcardDeck({ cards }: FlashcardDeckProps) {
   return (
     <div className="flex flex-col items-center w-full max-w-2xl mx-auto">
       <div className="w-full mb-6 flex flex-col gap-3">
-        {/* Filters and progress indicators */}
         <div className="flex justify-between items-center w-full px-1">
           <div className="flex items-center gap-2">
             <span className="text-sm font-medium">
@@ -220,7 +213,6 @@ export function FlashcardDeck({ cards }: FlashcardDeckProps) {
         </div>
       ) : (
         <>
-          {/* Display message when no cards match filters */}
           {activeCards.length === 0 ? (
             <div className="flex flex-col items-center justify-center h-[400px] p-8 text-center">
               <h2 className="text-xl font-semibold mb-2">No matching flashcards</h2>
@@ -238,7 +230,6 @@ export function FlashcardDeck({ cards }: FlashcardDeckProps) {
             </div>
           ) : (
             <>
-              {/* Flashcard container */}
               <div className="relative w-full">
                 {activeCards.map((card, index) => (
                   <Flashcard
@@ -252,7 +243,6 @@ export function FlashcardDeck({ cards }: FlashcardDeckProps) {
                 ))}
               </div>
 
-              {/* Navigation buttons */}
               <div className="flex justify-between w-full mt-6">
                 <Button
                   variant="outline"
