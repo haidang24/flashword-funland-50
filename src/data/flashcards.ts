@@ -1,6 +1,8 @@
 
 import { FlashcardData } from "@/components/Flashcard";
 
+// In a real application, this data would be stored in a database
+// For this demo, we're using a static array that can be modified at runtime
 export const flashcardData: FlashcardData[] = [
   {
     id: 1,
@@ -59,3 +61,27 @@ export const flashcardData: FlashcardData[] = [
     example: "The paradox of the liar - 'This statement is false' - creates a logical contradiction."
   }
 ];
+
+// In a real app with persistent storage, you would add these functions:
+/*
+export const addFlashcard = (card: Omit<FlashcardData, "id">): FlashcardData => {
+  const id = Math.max(0, ...flashcardData.map(card => card.id)) + 1;
+  const newCard = { ...card, id };
+  flashcardData.push(newCard);
+  return newCard;
+};
+
+export const updateFlashcard = (id: number, data: Partial<FlashcardData>): boolean => {
+  const index = flashcardData.findIndex(card => card.id === id);
+  if (index === -1) return false;
+  flashcardData[index] = { ...flashcardData[index], ...data };
+  return true;
+};
+
+export const deleteFlashcard = (id: number): boolean => {
+  const index = flashcardData.findIndex(card => card.id === id);
+  if (index === -1) return false;
+  flashcardData.splice(index, 1);
+  return true;
+};
+*/

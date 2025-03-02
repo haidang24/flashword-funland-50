@@ -1,10 +1,10 @@
-
 import { useState } from "react";
 import { Navbar } from "@/components/Navbar";
 import { FlashcardDeck } from "@/components/FlashcardDeck";
 import { flashcardData } from "@/data/flashcards";
 import { Button } from "@/components/ui/button";
-import { BookOpen } from "lucide-react";
+import { BookOpen, PlusCircle } from "lucide-react";
+import { Link } from "react-router-dom";
 
 const Index = () => {
   const [started, setStarted] = useState(false);
@@ -31,13 +31,25 @@ const Index = () => {
                   Enhance your English vocabulary with beautifully designed flashcards. 
                   Flip, learn, and master new words at your own pace.
                 </p>
-                <Button 
-                  size="lg" 
-                  onClick={() => setStarted(true)}
-                  className="mx-auto mt-4 animate-float"
-                >
-                  Start Learning
-                </Button>
+                <div className="flex flex-wrap justify-center gap-3">
+                  <Button 
+                    size="lg" 
+                    onClick={() => setStarted(true)}
+                    className="animate-float"
+                  >
+                    Start Learning
+                  </Button>
+                  <Button 
+                    size="lg"
+                    variant="outline"
+                    as={Link}
+                    to="/manage"
+                    className="animate-float"
+                  >
+                    <PlusCircle className="h-4 w-4 mr-2" />
+                    Manage Flashcards
+                  </Button>
+                </div>
               </div>
             </div>
             
@@ -67,13 +79,22 @@ const Index = () => {
             
             <FlashcardDeck cards={flashcardData} />
             
-            <Button 
-              variant="outline" 
-              className="mt-8 mx-auto" 
-              onClick={() => setStarted(false)}
-            >
-              Back to Home
-            </Button>
+            <div className="flex justify-center gap-4 mt-8">
+              <Button 
+                variant="outline" 
+                onClick={() => setStarted(false)}
+              >
+                Back to Home
+              </Button>
+              <Button 
+                variant="secondary"
+                as={Link}
+                to="/manage"
+              >
+                <PlusCircle className="h-4 w-4 mr-2" />
+                Manage Flashcards
+              </Button>
+            </div>
           </div>
         )}
       </main>
