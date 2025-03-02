@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { Navbar } from "@/components/Navbar";
 import { FlashcardDeck } from "@/components/FlashcardDeck";
@@ -39,16 +40,15 @@ const Index = () => {
                   >
                     Start Learning
                   </Button>
-                  <Button 
-                    size="lg"
-                    variant="outline"
-                    as={Link}
-                    to="/manage"
-                    className="animate-float"
-                  >
-                    <PlusCircle className="h-4 w-4 mr-2" />
-                    Manage Flashcards
-                  </Button>
+                  <Link to="/manage" className="animate-float">
+                    <Button 
+                      size="lg"
+                      variant="outline"
+                    >
+                      <PlusCircle className="h-4 w-4 mr-2" />
+                      Manage Flashcards
+                    </Button>
+                  </Link>
                 </div>
               </div>
             </div>
@@ -86,14 +86,12 @@ const Index = () => {
               >
                 Back to Home
               </Button>
-              <Button 
-                variant="secondary"
-                as={Link}
-                to="/manage"
-              >
-                <PlusCircle className="h-4 w-4 mr-2" />
-                Manage Flashcards
-              </Button>
+              <Link to="/manage">
+                <Button variant="secondary">
+                  <PlusCircle className="h-4 w-4 mr-2" />
+                  Manage Flashcards
+                </Button>
+              </Link>
             </div>
           </div>
         )}
