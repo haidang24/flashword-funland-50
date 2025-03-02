@@ -8,7 +8,7 @@ import { Card, CardContent, CardHeader, CardTitle, CardFooter } from "@/componen
 import { Plus, Save, Trash2, ArrowLeft, Tag } from "lucide-react";
 import { toast } from "sonner";
 import { useNavigate } from "react-router-dom";
-import { getFlashcards, getCategories, Category } from "@/data/flashcards";
+import { flashcardData, categories, Category } from "@/data/flashcards";
 import { FlashcardData } from "@/components/Flashcard";
 import {
   Select,
@@ -26,8 +26,7 @@ import {
 
 const ManageFlashcards = () => {
   const navigate = useNavigate();
-  const [cards, setCards] = useState<FlashcardData[]>(getFlashcards());
-  const categories = getCategories();
+  const [cards, setCards] = useState<FlashcardData[]>(flashcardData);
   const [newCard, setNewCard] = useState<Partial<FlashcardData>>({
     word: "",
     pronunciation: "",
