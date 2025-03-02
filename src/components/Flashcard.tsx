@@ -5,6 +5,7 @@ import { Card } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
 import { Check, X } from "lucide-react";
+import { categories } from "@/data/flashcards";
 
 export interface FlashcardData {
   id: number;
@@ -12,6 +13,7 @@ export interface FlashcardData {
   definition: string;
   example: string;
   pronunciation?: string;
+  categoryId?: string;
 }
 
 interface FlashcardProps {
@@ -25,6 +27,18 @@ interface FlashcardProps {
 export function Flashcard({ card, onNext, onKnown, onUnknown, isActive }: FlashcardProps) {
   const [isFlipped, setIsFlipped] = useState(false);
   const [isExiting, setIsExiting] = useState(false);
+
+  const getCategoryColor = (categoryId?: string) => {
+    if (!categoryId) return "";
+    const category = categories.find(c => c.id === categoryId);
+    return category ? category.color : "";
+  };
+
+  const getCategoryName = (categoryId?: string) => {
+    if (!categoryId) return "";
+    const category = categories.find(c => c.id === categoryId);
+    return category ? category.name : "";
+  };
 
   const handleFlip = () => {
     setIsFlipped(!isFlipped);
@@ -73,6 +87,13 @@ export function Flashcard({ card, onNext, onKnown, onUnknown, isActive }: Flashc
           <div className="absolute top-4 left-4 text-xs font-medium text-muted-foreground">
             <span className="bg-muted px-2 py-1 rounded-full">Tap to flip</span>
           </div>
+          {card.categoryId && (
+            <div className="absolute top-4 right-4">
+              <span className={`px-2 py-1 rounded-full text-xs text-white ${getCategoryColor(card.categoryId)}`}>
+                {getCategoryName(card.categoryId)}
+              </span>
+            </div>
+          )}
           <div className="space-y-4 w-full">
             <h2 className="text-4xl font-serif font-semibold tracking-tight">{card.word}</h2>
             {card.pronunciation && (
@@ -82,7 +103,14 @@ export function Flashcard({ card, onNext, onKnown, onUnknown, isActive }: Flashc
         </div>
         <div className="flashcard-back p-6 flex flex-col justify-between rounded-lg bg-card">
           <div className="space-y-4 w-full">
-            <h2 className="text-2xl font-serif font-semibold">{card.word}</h2>
+            <div className="flex justify-between items-center">
+              <h2 className="text-2xl font-serif font-semibold">{card.word}</h2>
+              {card.categoryId && (
+                <span className={`px-2 py-1 rounded-full text-xs text-white ${getCategoryColor(card.categoryId)}`}>
+                  {getCategoryName(card.categoryId)}
+                </span>
+              )}
+            </div>
             <p className="text-lg leading-relaxed">{card.definition}</p>
             <div>
               <p className="text-sm font-medium text-muted-foreground mb-1">Example:</p>

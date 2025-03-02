@@ -5,11 +5,24 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent, CardHeader, CardTitle, CardFooter } from "@/components/ui/card";
-import { Plus, Save, Trash2, ArrowLeft } from "lucide-react";
+import { Plus, Save, Trash2, ArrowLeft, Tag } from "lucide-react";
 import { toast } from "sonner";
 import { useNavigate } from "react-router-dom";
-import { flashcardData } from "@/data/flashcards";
+import { flashcardData, categories, Category } from "@/data/flashcards";
 import { FlashcardData } from "@/components/Flashcard";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import {
+  Tabs,
+  TabsContent,
+  TabsList,
+  TabsTrigger,
+} from "@/components/ui/tabs";
 
 const ManageFlashcards = () => {
   const navigate = useNavigate();
@@ -18,8 +31,10 @@ const ManageFlashcards = () => {
     word: "",
     pronunciation: "",
     definition: "",
-    example: ""
+    example: "",
+    categoryId: "vocabulary"
   });
+  const [activeTab, setActiveTab] = useState("all");
   const [editMode, setEditMode] = useState(false);
 
   const handleNewCardChange = (field: keyof FlashcardData, value: string) => {
@@ -41,7 +56,8 @@ const ManageFlashcards = () => {
       word: newCard.word || "",
       pronunciation: newCard.pronunciation || "",
       definition: newCard.definition || "",
-      example: newCard.example || ""
+      example: newCard.example || "",
+      categoryId: newCard.categoryId || "other"
     };
 
     const updatedCards = [...cards, cardToAdd];
@@ -53,7 +69,8 @@ const ManageFlashcards = () => {
       word: "",
       pronunciation: "",
       definition: "",
-      example: ""
+      example: "",
+      categoryId: "vocabulary"
     });
     
     toast.success("Flashcard added successfully!");
@@ -86,6 +103,16 @@ const ManageFlashcards = () => {
     console.log("Flashcard data updated:", updatedCards);
     // Since we can't directly modify the imported data in this demo,
     // in a real app you would save this to localStorage or a database
+  };
+
+  // Filter cards by category
+  const filteredCards = activeTab === 'all' 
+    ? cards 
+    : cards.filter(card => card.categoryId === activeTab);
+
+  // Count cards by category
+  const getCategoryCount = (categoryId: string) => {
+    return cards.filter(card => card.categoryId === categoryId).length;
   };
 
   return (
@@ -151,6 +178,29 @@ const ManageFlashcards = () => {
                     placeholder="e.g. /sɪmplɪsɪti/"
                   />
                 </div>
+                <div>
+                  <label htmlFor="category" className="block text-sm font-medium mb-1">
+                    Category <span className="text-destructive">*</span>
+                  </label>
+                  <Select 
+                    value={newCard.categoryId} 
+                    onValueChange={(value) => handleNewCardChange("categoryId", value)}
+                  >
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select a category" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {categories.map((category) => (
+                        <SelectItem key={category.id} value={category.id}>
+                          <div className="flex items-center">
+                            <span className={`w-2 h-2 rounded-full mr-2 ${category.color}`}></span>
+                            {category.name}
+                          </div>
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
               </div>
               <div className="space-y-3">
                 <div>
@@ -188,72 +238,123 @@ const ManageFlashcards = () => {
           </CardFooter>
         </Card>
 
-        {/* List of existing flashcards */}
-        <h2 className="text-xl font-medium mb-4">Your Flashcards ({cards.length})</h2>
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-          {cards.map((card) => (
-            <Card key={card.id} className="border border-border/50 hover:border-primary/20 transition-colors">
-              <CardHeader className="pb-2">
-                <CardTitle className="text-lg flex justify-between items-center">
-                  {editMode ? (
-                    <Input
-                      value={card.word}
-                      onChange={(e) => handleUpdateCard(card.id, "word", e.target.value)}
-                      className="font-semibold"
-                    />
-                  ) : (
-                    <span>{card.word}</span>
-                  )}
-                  {editMode && (
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      onClick={() => handleDeleteCard(card.id)}
-                      className="h-7 w-7 text-destructive hover:text-destructive/90 hover:bg-destructive/10"
-                    >
-                      <Trash2 className="h-4 w-4" />
-                    </Button>
-                  )}
-                </CardTitle>
-                {editMode ? (
-                  <Input
-                    value={card.pronunciation || ""}
-                    onChange={(e) => handleUpdateCard(card.id, "pronunciation", e.target.value)}
-                    className="text-sm text-muted-foreground"
-                    placeholder="Pronunciation"
-                  />
-                ) : (
-                  card.pronunciation && <p className="text-sm text-muted-foreground">{card.pronunciation}</p>
-                )}
-              </CardHeader>
-              <CardContent className="space-y-2">
-                <div>
-                  <p className="text-xs text-muted-foreground mb-1">Definition:</p>
-                  {editMode ? (
-                    <Textarea
-                      value={card.definition}
-                      onChange={(e) => handleUpdateCard(card.id, "definition", e.target.value)}
-                      rows={2}
-                    />
-                  ) : (
-                    <p className="text-sm">{card.definition}</p>
-                  )}
-                </div>
-                <div>
-                  <p className="text-xs text-muted-foreground mb-1">Example:</p>
-                  {editMode ? (
-                    <Textarea
-                      value={card.example}
-                      onChange={(e) => handleUpdateCard(card.id, "example", e.target.value)}
-                      rows={2}
-                    />
-                  ) : (
-                    <p className="text-sm italic">{card.example}</p>
-                  )}
-                </div>
-              </CardContent>
-            </Card>
-          ))}
+        {/* Category tabs */}
+        <div className="mb-6">
+          <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
+            <TabsList className="w-full mb-4 overflow-x-auto flex-wrap justify-start h-auto p-1">
+              <TabsTrigger value="all" className="mb-1">
+                All ({cards.length})
+              </TabsTrigger>
+              {categories.map(category => (
+                <TabsTrigger key={category.id} value={category.id} className="mb-1">
+                  <span className={`w-2 h-2 rounded-full mr-2 ${category.color}`}></span>
+                  {category.name} ({getCategoryCount(category.id)})
+                </TabsTrigger>
+              ))}
+            </TabsList>
+
+            {/* List of existing flashcards */}
+            <TabsContent value={activeTab} className="mt-0">
+              <h2 className="text-xl font-medium mb-4">
+                {activeTab === 'all' 
+                  ? `Your Flashcards (${filteredCards.length})` 
+                  : `${categories.find(c => c.id === activeTab)?.name} Flashcards (${filteredCards.length})`}
+              </h2>
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                {filteredCards.map((card) => (
+                  <Card key={card.id} className="border border-border/50 hover:border-primary/20 transition-colors">
+                    <CardHeader className="pb-2">
+                      <CardTitle className="text-lg flex justify-between items-center">
+                        {editMode ? (
+                          <Input
+                            value={card.word}
+                            onChange={(e) => handleUpdateCard(card.id, "word", e.target.value)}
+                            className="font-semibold"
+                          />
+                        ) : (
+                          <div className="flex items-center">
+                            <span>{card.word}</span>
+                            {card.categoryId && (
+                              <span className={`ml-2 w-2 h-2 rounded-full ${categories.find(c => c.id === card.categoryId)?.color}`}></span>
+                            )}
+                          </div>
+                        )}
+                        {editMode && (
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            onClick={() => handleDeleteCard(card.id)}
+                            className="h-7 w-7 text-destructive hover:text-destructive/90 hover:bg-destructive/10"
+                          >
+                            <Trash2 className="h-4 w-4" />
+                          </Button>
+                        )}
+                      </CardTitle>
+                      {editMode ? (
+                        <Input
+                          value={card.pronunciation || ""}
+                          onChange={(e) => handleUpdateCard(card.id, "pronunciation", e.target.value)}
+                          className="text-sm text-muted-foreground"
+                          placeholder="Pronunciation"
+                        />
+                      ) : (
+                        card.pronunciation && <p className="text-sm text-muted-foreground">{card.pronunciation}</p>
+                      )}
+                    </CardHeader>
+                    <CardContent className="space-y-2">
+                      {editMode && (
+                        <div className="mb-3">
+                          <label className="text-xs text-muted-foreground mb-1 block">Category:</label>
+                          <Select 
+                            value={card.categoryId || "other"} 
+                            onValueChange={(value) => handleUpdateCard(card.id, "categoryId", value)}
+                          >
+                            <SelectTrigger className="h-8 text-sm">
+                              <SelectValue placeholder="Select a category" />
+                            </SelectTrigger>
+                            <SelectContent>
+                              {categories.map((category) => (
+                                <SelectItem key={category.id} value={category.id}>
+                                  <div className="flex items-center">
+                                    <span className={`w-2 h-2 rounded-full mr-2 ${category.color}`}></span>
+                                    {category.name}
+                                  </div>
+                                </SelectItem>
+                              ))}
+                            </SelectContent>
+                          </Select>
+                        </div>
+                      )}
+                      <div>
+                        <p className="text-xs text-muted-foreground mb-1">Definition:</p>
+                        {editMode ? (
+                          <Textarea
+                            value={card.definition}
+                            onChange={(e) => handleUpdateCard(card.id, "definition", e.target.value)}
+                            rows={2}
+                          />
+                        ) : (
+                          <p className="text-sm">{card.definition}</p>
+                        )}
+                      </div>
+                      <div>
+                        <p className="text-xs text-muted-foreground mb-1">Example:</p>
+                        {editMode ? (
+                          <Textarea
+                            value={card.example}
+                            onChange={(e) => handleUpdateCard(card.id, "example", e.target.value)}
+                            rows={2}
+                          />
+                        ) : (
+                          <p className="text-sm italic">{card.example}</p>
+                        )}
+                      </div>
+                    </CardContent>
+                  </Card>
+                ))}
+              </div>
+            </TabsContent>
+          </Tabs>
         </div>
       </main>
       
